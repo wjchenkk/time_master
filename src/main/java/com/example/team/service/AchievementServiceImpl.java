@@ -49,14 +49,4 @@ public class AchievementServiceImpl implements AchievementService {
         return achievementDAO.getUnAchievement(userId);
     }
 
-    @Override
-    public List<AchievementType> getAchievement(int userId) {
-        List<Achievement> aList=getByUserId(userId);
-        List<AchievementType> atList=achievementTypeDAO.getAchievementType();
-        for (AchievementType at:atList){
-            at.setAstatus(achievementDAO.getAchievement(userId,at.getAId()).getStatus());
-        }
-
-        return null;
-    }
 }
