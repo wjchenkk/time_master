@@ -14,7 +14,7 @@ public interface TeamTodoSetService {
 
     TeamTodoSet getById(int teamTodoSetId);
 
-    TeamTodoSet getByName(String name);
+    TeamTodoSet getByName(String name,int teamId);
 
     List<TeamTodoSet> listByTeamId(int teamId);
 }

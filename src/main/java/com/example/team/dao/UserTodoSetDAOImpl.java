@@ -11,9 +11,9 @@ import java.util.List;
 public class UserTodoSetDAOImpl extends BaseDAOImpl<UserTodoSet> implements UserTodoSetDAO {
 
     @Override
-    public UserTodoSet getByName(String name) {
-        String hql = "from UserTodoSet where name=:name";
-        return (UserTodoSet) getSession().createQuery(hql).setParameter("name", name).uniqueResult();
+    public UserTodoSet getByName(String name,int userId) {
+        String hql = "from UserTodoSet where name=:name and userId=:userId";
+        return (UserTodoSet) getSession().createQuery(hql).setParameter("name", name).setParameter("userId",userId).uniqueResult();
     }
 
     @Override
