@@ -10,11 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(rollbackFor = Exception.class)
 public class UserDAOImpl extends BaseDAOImpl<User> implements UserDAO {
 
-    @Override
-    public User getByName(String name) {
-        String hql = "from User where name=:name";
-        return (User) getSession().createQuery(hql).setParameter("name", name).uniqueResult();
-    }
 
     @Override
     public User getByTel(String tel) {

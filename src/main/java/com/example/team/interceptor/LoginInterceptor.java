@@ -14,7 +14,7 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
     @Autowired
     private RedisService redisService;
 
-    @Override
+    /*@Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
                              Object handler) throws IOException {
         boolean flg = false; // 是否通过
@@ -38,5 +38,5 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json; charset=utf-8");
         response.getWriter().write(content);
-    }
+    }*/
 }
