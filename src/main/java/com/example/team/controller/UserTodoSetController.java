@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,16 +53,17 @@ public class UserTodoSetController extends BaseController {
      * @return java.lang.String 创建结果
      * @update time: 2020/6/3 9:02
      */
-    public String create(@RequestBody Map<String, Object> param, @RequestHeader("id") int userId) {
+    public Map<String, Integer> create(@RequestBody Map<String, Object> param, @RequestHeader("id") int userId) {
         UserTodoSet userTodoSet = new UserTodoSet();
         userTodoSet.setName(param.get("name").toString());
         userTodoSet.setUserId(userId);
         userTodoSet.setCreate(DateUtil.getCurrentTime());
+        Map<String, Integer> result = new HashMap<>();
         if (userTodoSetService.createUserTodoSet(userTodoSet)) {
             UserTodoSet userTodoSet1 = userTodoSetService.getByName(userTodoSet.getName());
-            return "create-success,userTodoSetId:" + userTodoSet1.getUserTodoSetId();
+            result.put("userTodoSetId", userTodoSet1.getUserTodoSetId());
         }
-        return "create-fail";
+        return result;
     }
 
     @RequestMapping(value = "/update", method = RequestMethod.POST)
@@ -72,17 +74,18 @@ public class UserTodoSetController extends BaseController {
      * @return java.lang.String 更新结果
      * @update time: 2020/6/3 9:02
      */
-    public String update(@RequestBody Map<String, Object> param, @RequestHeader("id") int userId) {
+    public Map<String, Integer> update(@RequestBody Map<String, Object> param, @RequestHeader("id") int userId) {
         UserTodoSet userTodoSet = new UserTodoSet();
         userTodoSet.setUserTodoSetId(Integer.parseInt(param.get("userTodoSetId").toString()));
         userTodoSet.setName(param.get("name").toString());
         userTodoSet.setUserId(userId);
         userTodoSet.setCreate(java.sql.Date.valueOf(param.get("create").toString()));
+        Map<String, Integer> result = new HashMap<>();
         if (userTodoSetService.updateUserTodoSet(userTodoSet)) {
             UserTodoSet userTodoSet1 = userTodoSetService.getByName(userTodoSet.getName());
-            return "update-success,userTodoSetId:"+userTodoSet1.getUserTodoSetId();
+            result.put("userTodoSetId", userTodoSet1.getUserTodoSetId());
         }
-        return "update-fail";
+        return result;
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.POST)

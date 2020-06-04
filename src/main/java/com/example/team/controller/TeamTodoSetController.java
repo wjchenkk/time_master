@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -56,17 +57,18 @@ public class TeamTodoSetController extends BaseController {
      * @return: java.lang.String
      * @update: time: 2020/6/3 9:25
      */
-    private String createTeamTodoSet(@RequestBody Map<String, Object> param) {
+    private Map<String, Integer> createTeamTodoSet(@RequestBody Map<String, Object> param) {
         String name = param.get("name").toString();
         TeamTodoSet teamTodoSet = new TeamTodoSet();
         teamTodoSet.setName(name);
         teamTodoSet.setTeamId(Integer.parseInt(param.get("teamId").toString()));
         teamTodoSet.setCreate(DateUtil.getCurrentTime());
+        Map<String, Integer> result = new HashMap<>();
         if (teamTodoSetService.createTeamTodoSet(teamTodoSet)) {
             TeamTodoSet teamTodoSet1 = teamTodoSetService.getByName(name);
-            return "create-success,teamTodoSetId:"+teamTodoSet1.getTeamTodoSetId();
+            result.put("teamTodoSetId", teamTodoSet1.getTeamTodoSetId());
         }
-        return "create-fail";
+        return result;
     }
 
     @RequestMapping(value = "/update", method = RequestMethod.POST)
@@ -77,17 +79,18 @@ public class TeamTodoSetController extends BaseController {
      * @return: java.lang.String
      * @update: time: 2020/6/3 9:25
      */
-    private String updateTeamTodoSet(@RequestBody Map<String, Object> param) {
+    private Map<String, Integer> updateTeamTodoSet(@RequestBody Map<String, Object> param) {
         TeamTodoSet teamTodoSet = new TeamTodoSet();
         teamTodoSet.setName(param.get("name").toString());
         teamTodoSet.setTeamId(Integer.parseInt(param.get("teamId").toString()));
         teamTodoSet.setTeamTodoSetId(Integer.parseInt(param.get("teamTodoSetId").toString()));
         teamTodoSet.setCreate(Date.valueOf(param.get("create").toString()));
+        Map<String, Integer> result = new HashMap<>();
         if (teamTodoSetService.updateTeamTodoSet(teamTodoSet)) {
             TeamTodoSet teamTodoSet1 = teamTodoSetService.getByName(teamTodoSet.getName());
-            return "update-success,teamTodoSetId:" + teamTodoSet1.getTeamTodoSetId();
+            result.put("teamTodoSetId", teamTodoSet1.getTeamTodoSetId());
         }
-        return "update-fail";
+        return result;
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
