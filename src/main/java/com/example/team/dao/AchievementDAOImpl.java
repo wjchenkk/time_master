@@ -35,11 +35,6 @@ public class AchievementDAOImpl extends BaseDAOImpl<Achievement> implements Achi
     }
 
     @Override
-    public Achievement getAchievement(int userId,int aId){
-        String hql="from Achievement where userId=:userId and type=:aId";
-        return (Achievement) getSession().createQuery(hql).setParameter("userId",userId).setParameter("aId",aId).uniqueResult();
-    }
-    @Override
     public List<Achievement> getUnAchievement(int userId){
         String hql="from Achievement where user.userId=:userId and status=:status";
         return (List<Achievement>) getSession().createQuery(hql).setParameter("userId",userId).setParameter("status","0").list();

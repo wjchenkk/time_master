@@ -11,5 +11,4 @@ public interface AchievementService{
     void updateAchievement(int userId);
     List<Achievement> getByUserId(int userId);
     List<Achievement> getUnAchievement(int userId);
-    List<AchievementType> getAchievement(int userId);
 }

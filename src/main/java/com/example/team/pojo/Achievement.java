@@ -23,10 +23,6 @@ public class Achievement {
     private AchievementType achievementType;
 
 
-    public int getType() {
-        return type;
-    }
-
     public void setaId(int aId) {
         this.aId = aId;
     }
