@@ -11,9 +11,9 @@ import java.util.List;
 public class TeamTodoSetDAOImpl extends BaseDAOImpl<TeamTodoSet> implements TeamTodoSetDAO {
 
     @Override
-    public TeamTodoSet getByName(String name) {
-        String hql = "from TeamTodoSet where name=:name";
-        return (TeamTodoSet) getSession().createQuery(hql).setParameter("name", name).uniqueResult();
+    public TeamTodoSet getByName(String name,int teamId) {
+        String hql = "from TeamTodoSet where name=:name and teamId=:teamId";
+        return (TeamTodoSet) getSession().createQuery(hql).setParameter("name", name).setParameter("teamId",teamId).uniqueResult();
     }
 
     @Override

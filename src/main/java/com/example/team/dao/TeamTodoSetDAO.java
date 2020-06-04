@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface TeamTodoSetDAO extends BaseDAO<TeamTodoSet>{
 
-    TeamTodoSet getByName(String name);
+    TeamTodoSet getByName(String name,int teamId);
 
     List<TeamTodoSet> list(int teamId);
 }

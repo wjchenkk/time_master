@@ -22,7 +22,7 @@ public class UserTodoSetServiceImpl implements UserTodoSetService {
 
     @Override
     public boolean createUserTodoSet(UserTodoSet userTodoSet) {
-        UserTodoSet userTodoSet1 = userTodoSetDAO.getByName(userTodoSet.getName());
+        UserTodoSet userTodoSet1 = userTodoSetDAO.getByName(userTodoSet.getName(),userTodoSet.getUserId());
         if (userTodoSet1 == null) {
             userTodoSetDAO.add(userTodoSet);
             return true;
@@ -32,7 +32,7 @@ public class UserTodoSetServiceImpl implements UserTodoSetService {
 
     @Override
     public boolean updateUserTodoSet(UserTodoSet userTodoSet) {
-        UserTodoSet userTodoSet1 = userTodoSetDAO.getByName(userTodoSet.getName());
+        UserTodoSet userTodoSet1 = userTodoSetDAO.getByName(userTodoSet.getName(),userTodoSet.getUserId());
         if (userTodoSet1 == null || userTodoSet1.getUserTodoSetId() == userTodoSet.getUserTodoSetId()) {
             userTodoSetDAO.update(userTodoSet);
             return true;
@@ -57,8 +57,8 @@ public class UserTodoSetServiceImpl implements UserTodoSetService {
     }
 
     @Override
-    public UserTodoSet getByName(String name) {
-        return userTodoSetDAO.getByName(name);
+    public UserTodoSet getByName(String name,int userId) {
+        return userTodoSetDAO.getByName(name,userId);
     }
 
     @Override

@@ -60,7 +60,7 @@ public class UserTodoSetController extends BaseController {
         userTodoSet.setCreate(DateUtil.getCurrentTime());
         Map<String, Integer> result = new HashMap<>();
         if (userTodoSetService.createUserTodoSet(userTodoSet)) {
-            UserTodoSet userTodoSet1 = userTodoSetService.getByName(userTodoSet.getName());
+            UserTodoSet userTodoSet1 = userTodoSetService.getByName(userTodoSet.getName(),userId);
             result.put("userTodoSetId", userTodoSet1.getUserTodoSetId());
         }
         return result;
@@ -82,7 +82,7 @@ public class UserTodoSetController extends BaseController {
         userTodoSet.setCreate(java.sql.Date.valueOf(param.get("create").toString()));
         Map<String, Integer> result = new HashMap<>();
         if (userTodoSetService.updateUserTodoSet(userTodoSet)) {
-            UserTodoSet userTodoSet1 = userTodoSetService.getByName(userTodoSet.getName());
+            UserTodoSet userTodoSet1 = userTodoSetService.getByName(userTodoSet.getName(),userId);
             result.put("userTodoSetId", userTodoSet1.getUserTodoSetId());
         }
         return result;
