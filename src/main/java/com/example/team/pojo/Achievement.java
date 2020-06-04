@@ -22,8 +22,9 @@ public class Achievement {
     @JoinColumn(name="type")
     private AchievementType achievementType;
 
-    public int getaId() {
-        return aId;
+
+    public int getType() {
+        return type;
     }
 
     public void setaId(int aId) {
@@ -49,6 +50,7 @@ public class Achievement {
     public AchievementType getAchievementType() {
         return achievementType;
     }
+
 
     public void setAchievementType(AchievementType achievementType) {
         this.achievementType = achievementType;

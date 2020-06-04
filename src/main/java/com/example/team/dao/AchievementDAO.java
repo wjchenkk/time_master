@@ -5,6 +5,7 @@ import com.example.team.pojo.Achievement;
 
 import java.util.List;
 
+
 public interface AchievementDAO extends BaseDAO<Achievement>{
     void update(int userId,int achievementTypeId);
     List<Achievement> getByUserId(int userId);

@@ -7,6 +7,9 @@ import com.example.team.service.TeamTodoSetService;
 import com.example.team.service.UserService;
 import com.example.team.util.DataVo;
 import com.example.team.util.DateUtil;
+
+import com.example.team.util.ExcelWr;
+
 import com.example.team.util.ExcelWriter;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -195,101 +198,146 @@ public class TeamController extends BaseController {
         int option = Integer.parseInt(param.get("option").toString());
         int teamId = Integer.parseInt(param.get("teamId").toString());
         String path = param.get("path").toString();
-        List<TeamTodo> teamTodoList = teamTodoService.listByUser(teamId,userId);
+        Set<User> setUser = userService.getMembers(teamId);
         List<TeamTodoSet> teamTodoSetList = teamTodoSetService.listByTeamId(teamId);
         List<DataVo> dataVOList = new ArrayList<>();
         if (option == 1){
-            DataVo dataVO = new DataVo();
-            for (TeamTodo list : teamTodoList){
-                if (list.getTodoStatusId()==2){
-                    todoNum++;
-                }
-            }
-            dataVO.setName("Todo");
-            dataVO.setCompletion(todoNum + "/" + teamTodoList.size());
-            DataVo dataVO2 = new DataVo();
-            for (TeamTodoSet set : teamTodoSetList){
-                int i = 0;
-                List<TeamTodo> todoList = teamTodoService.listTeamTodo(set.getTeamTodoSetId(),teamId,userId);
-                for (TeamTodo list : todoList){
-                    if (list.getTodoStatusId()==2){
-                        i++;
-                    }
-                }
-                if (i == todoList.size()){
-                    todoSetNum++;
-                }
-            }
-            dataVO2.setSName("TodoSet");
-            dataVO2.setCompletion(todoSetNum + "/" + teamTodoSetList.size());
-            dataVOList.add(dataVO2);
-            dataVOList.add(dataVO);
-            records = "操作1";
-        }
-        else if (option == 2){
-            for (TeamTodoSet set : teamTodoSetList){
+            for (User user : setUser){
+                todoNum = 0;
+                todoSetNum = 0;
+                List<TeamTodo> teamTodoList = teamTodoService.listByUser(teamId,user.getUserId());
+                DataVo dataV = new DataVo();
+                dataV.setUserName(user.getName());
                 DataVo dataVO = new DataVo();
-                int i = 0;
-                List<TeamTodo> todoList = teamTodoService.listTeamTodo(set.getTeamTodoSetId(),teamId,userId);
-                for (TeamTodo list : todoList){
-                    DataVo dataVO1 = new DataVo();
+                for (TeamTodo list : teamTodoList){
                     if (list.getTodoStatusId()==2){
-                        dataVO1.setName(list.getName());
-                        dataVO1.setSName(set.getName());
-                        dataVO1.setRecord(1);
-                        i++;
+                        todoNum++;
                     }
-                    else {
-                        dataVO1.setName(list.getName());
-                        dataVO1.setSName(set.getName());
-                        dataVO1.setRecord(0);
+                }
+                dataVO.setName("Todo");
+                dataVO.setCompletion(todoNum + "/" + teamTodoList.size());
+                DataVo dataVO2 = new DataVo();
+                for (TeamTodoSet set : teamTodoSetList){
+                    int i = 0;
+                    List<TeamTodo> todoList = teamTodoService.listTeamTodo(set.getTeamTodoSetId(),teamId,user.getUserId());
+                    for (TeamTodo list : todoList){
+                        if (list.getTodoStatusId()==2){
+                            i++;
+                        }
                     }
-                    dataVOList.add(dataVO1);
+                    if (i == todoList.size()){
+                        todoSetNum++;
+                    }
                 }
-                if (i == todoList.size()){
-                    dataVO.setSName(set.getName());
-                    dataVO.setRecord(1);
-                }
-                else {
-                    dataVO.setSName(set.getName());
-                    dataVO.setRecord(0);
-                }
+                dataVO2.setSName("TodoSet");
+                dataVO2.setCompletion(todoSetNum + "/" + teamTodoSetList.size());
+                dataVOList.add(dataV);
+                dataVOList.add(dataVO2);
                 dataVOList.add(dataVO);
             }
+            records = "操作1";
+            // 写入数据到工作簿对象内
+            Workbook workbook = ExcelWr.exportData(dataVOList);
+            // 以文件的形式输出工作簿对象
+            FileOutputStream fileOut = null;
+            try {
+                //文件不用创建，会自动生成的
+                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                java.util.Date create = new java.util.Date();
+                String exportFilePath = path + "\\output-" + df.format(create) + ".xlsx";
+                File exportFile = new File(exportFilePath);
+                if (!exportFile.exists()) {
+                    exportFile.createNewFile();
+                }
+                fileOut = new FileOutputStream(exportFilePath);
+                workbook.write(fileOut);
+                fileOut.flush();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (null != fileOut) {
+                        fileOut.close();
+                    }
+                    if (null != workbook) {
+                        workbook.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        else if (option == 2){
+            for (User user : setUser){
+                DataVo dataV = new DataVo();
+                dataV.setUserName(user.getName());
+                dataVOList.add(dataV);
+                for (TeamTodoSet set : teamTodoSetList){
+                    DataVo dataVO = new DataVo();
+                    int i = 0;
+                    List<TeamTodo> todoList = teamTodoService.listTeamTodo(set.getTeamTodoSetId(),teamId,user.getUserId());
+                    for (TeamTodo list : todoList){
+                        if (list.getTodoStatusId()==2){
+                            i++;
+                        }
+                    }
+                    if (i == todoList.size()){
+                        dataVO.setSName(set.getName());
+                        dataVO.setSetRecord("完成");
+                    }
+                    else {
+                        dataVO.setSName(set.getName());
+                        dataVO.setSetRecord("未完成");
+                    }
+                    dataVOList.add(dataVO);
+                    for (TeamTodo list : todoList){
+                        DataVo dataVO1 = new DataVo();
+                        if (list.getTodoStatusId()==2){
+                            dataVO1.setName(list.getName());
+                            dataVO1.setRecord("完成");
+                        }
+                        else {
+                            dataVO1.setName(list.getName());
+                            dataVO1.setRecord("未完成");
+                        }
+                        dataVOList.add(dataVO1);
+                    }
+                }
+            }
             records = "操作2";
+            // 写入数据到工作簿对象内
+            Workbook workbook = ExcelWriter.exportData(dataVOList);
+            // 以文件的形式输出工作簿对象
+            FileOutputStream fileOut = null;
+            try {
+                //文件不用创建，会自动生成的
+                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                java.util.Date create = new java.util.Date();
+                String exportFilePath = path + "\\output-" + df.format(create) + ".xlsx";
+                File exportFile = new File(exportFilePath);
+                if (!exportFile.exists()) {
+                    exportFile.createNewFile();
+                }
+                fileOut = new FileOutputStream(exportFilePath);
+                workbook.write(fileOut);
+                fileOut.flush();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (null != fileOut) {
+                        fileOut.close();
+                    }
+                    if (null != workbook) {
+                        workbook.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         else {
             records = "option输入错误";
-        }
-        // 写入数据到工作簿对象内
-        Workbook workbook = ExcelWriter.exportData(dataVOList);
-        // 以文件的形式输出工作簿对象
-        FileOutputStream fileOut = null;
-        try {
-            //文件不用创建，会自动生成的
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-            java.util.Date create = new java.util.Date();
-            String exportFilePath = path + "\\output-" + df.format(create) + ".xlsx";
-            File exportFile = new File(exportFilePath);
-            if (!exportFile.exists()) {
-                exportFile.createNewFile();
-            }
-            fileOut = new FileOutputStream(exportFilePath);
-            workbook.write(fileOut);
-            fileOut.flush();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (null != fileOut) {
-                    fileOut.close();
-                }
-                if (null != workbook) {
-                    workbook.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
         return records;
     }

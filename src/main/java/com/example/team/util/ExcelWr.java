@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class ExcelWriter {
+public class ExcelWr {
     private static List<String> CELL_HEADS; //列头
 
     static {
@@ -17,8 +17,7 @@ public class ExcelWriter {
         CELL_HEADS.add("用户名");
         CELL_HEADS.add("待办集");
         CELL_HEADS.add("待办");
-        CELL_HEADS.add("待办完成情况");
-        CELL_HEADS.add("待办集完成情况");
+        CELL_HEADS.add("完成度");
     }
 
     /**
@@ -132,17 +131,10 @@ public class ExcelWriter {
         // 待办名
         cell = row.createCell(cellNum++);
         cell.setCellValue(null == data.getName() ? "" : data.getName());
-        // 待办情况记录（0未完成，1完成）
+        //待办完成度
         cell = row.createCell(cellNum++);
-        if (null != data.getRecord()) {
-            cell.setCellValue(data.getRecord());
-        } else {
-            cell.setCellValue("");
-        }
-        // 待办集情况记录（0未完成，1完成）
-        cell = row.createCell(cellNum++);
-        if (null != data.getSetRecord()) {
-            cell.setCellValue(data.getSetRecord());
+        if (null != data.getCompletion()) {
+            cell.setCellValue(data.getCompletion());
         } else {
             cell.setCellValue("");
         }

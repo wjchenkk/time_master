@@ -5,6 +5,11 @@ package com.example.team.util;
  */
 public class DataVo {
     /**
+     * 用户名
+     */
+    private String userName;
+
+    /**
      * 待办名
      */
     private String name;
@@ -15,14 +20,23 @@ public class DataVo {
     private String sName;
 
     /**
-     * 待办情况记录（0未完成，1完成）
+     * 待办情况记录
      */
-    private Integer record;
+    private String record;
+
+    /**
+     * 待办情况记录
+     */
+    private String setRecord;
 
     /**
      * 待办完成度
      */
     private String completion;
+
+    public String getUserName() { return userName; }
+
+    public void setUserName(String userName) { this.userName = userName; }
 
     public String getName() {
         return name;
@@ -40,12 +54,20 @@ public class DataVo {
         this.sName = sName;
     }
 
-    public Integer getRecord() {
+    public String getRecord() {
         return record;
     }
 
-    public void setRecord(Integer record) {
+    public void setRecord(String record) {
         this.record = record;
+    }
+
+    public String getSetRecord() {
+        return setRecord;
+    }
+
+    public void setSetRecord(String setRecord) {
+        this.setRecord = setRecord;
     }
 
     public String getCompletion(){

@@ -27,7 +27,7 @@ public class AchievementType {
     @JsonIgnore
     private Set<User> users = new HashSet<>();
 
-    public int getaId() {
+    public int getAId() {
         return aId;
     }
 
