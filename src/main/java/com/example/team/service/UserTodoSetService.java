@@ -13,7 +13,7 @@ public interface UserTodoSetService {
 
     UserTodoSet getById(int userTodoSetId);
 
-    UserTodoSet getByName(String name);
+    UserTodoSet getByName(String name,int userId);
 
     List<UserTodoSet> listByUserId(int userId);
 }

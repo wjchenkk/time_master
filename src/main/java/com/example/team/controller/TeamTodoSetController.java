@@ -58,14 +58,15 @@ public class TeamTodoSetController extends BaseController {
      * @update: time: 2020/6/3 9:25
      */
     private Map<String, Integer> createTeamTodoSet(@RequestBody Map<String, Object> param) {
+        int teamId = Integer.parseInt(param.get("teamId").toString());
         String name = param.get("name").toString();
         TeamTodoSet teamTodoSet = new TeamTodoSet();
         teamTodoSet.setName(name);
-        teamTodoSet.setTeamId(Integer.parseInt(param.get("teamId").toString()));
+        teamTodoSet.setTeamId(teamId);
         teamTodoSet.setCreate(DateUtil.getCurrentTime());
         Map<String, Integer> result = new HashMap<>();
         if (teamTodoSetService.createTeamTodoSet(teamTodoSet)) {
-            TeamTodoSet teamTodoSet1 = teamTodoSetService.getByName(name);
+            TeamTodoSet teamTodoSet1 = teamTodoSetService.getByName(name,teamId);
             result.put("teamTodoSetId", teamTodoSet1.getTeamTodoSetId());
         }
         return result;
@@ -80,14 +81,15 @@ public class TeamTodoSetController extends BaseController {
      * @update: time: 2020/6/3 9:25
      */
     private Map<String, Integer> updateTeamTodoSet(@RequestBody Map<String, Object> param) {
+        int teamId = Integer.parseInt(param.get("teamId").toString());
         TeamTodoSet teamTodoSet = new TeamTodoSet();
         teamTodoSet.setName(param.get("name").toString());
-        teamTodoSet.setTeamId(Integer.parseInt(param.get("teamId").toString()));
+        teamTodoSet.setTeamId(teamId);
         teamTodoSet.setTeamTodoSetId(Integer.parseInt(param.get("teamTodoSetId").toString()));
         teamTodoSet.setCreate(Date.valueOf(param.get("create").toString()));
         Map<String, Integer> result = new HashMap<>();
         if (teamTodoSetService.updateTeamTodoSet(teamTodoSet)) {
-            TeamTodoSet teamTodoSet1 = teamTodoSetService.getByName(teamTodoSet.getName());
+            TeamTodoSet teamTodoSet1 = teamTodoSetService.getByName(teamTodoSet.getName(),teamId);
             result.put("teamTodoSetId", teamTodoSet1.getTeamTodoSetId());
         }
         return result;
