@@ -110,7 +110,7 @@ public class TeamController extends BaseController {
     public String inviteMember(@RequestBody Map<String, Object> param) {
         int teamId = Integer.parseInt(param.get("teamId").toString());
         String email = param.get("email").toString();
-        int userId = userService.getUserId("", email, "");
+        int userId = userService.getUserId("", email);
         Team team=userService.joinTeam(teamId, userId);
         if (team != null) {
             if(team.getTeamId()==-1){
@@ -132,7 +132,7 @@ public class TeamController extends BaseController {
     public String outMember(@RequestBody Map<String, Object> param) {
         int teamId = Integer.parseInt(param.get("teamId").toString());
         String email = param.get("email").toString();
-        int userId = userService.getUserId("", email, "");
+        int userId = userService.getUserId("", email);
         if (userService.quitTeam(teamId, userId)) {
             return "out-success";
         }

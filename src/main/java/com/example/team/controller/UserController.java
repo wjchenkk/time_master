@@ -4,6 +4,7 @@ import com.example.team.pojo.*;
 import com.example.team.service.*;
 import com.example.team.util.DateUtil;
 import com.example.team.util.MailUtil;
+import com.example.team.util.RandomNameUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -83,8 +84,8 @@ public class UserController extends BaseController {
         user.setCreate(DateUtil.getCurrentTime());
         Pet pet = new Pet();
         pet.setBirth(DateUtil.getCurrentTime());
-        pet.setSex(1);
-        pet.setName("简时");
+        pet.setSex(new Random(System.currentTimeMillis()).nextInt(2));
+        pet.setName(RandomNameUtil.getRandomJName());
         pet.setLevel(1);
         String verification = redisService.get(user.getEmail());
         if (verification != null) {
@@ -203,7 +204,7 @@ public class UserController extends BaseController {
      * @update: time: 2020/6/3 9:00
      */
     public String findPassword(@RequestParam String email) {
-        int userId = userService.getUserId("", email, "");
+        int userId = userService.getUserId("", email);
         String address="http://3554ff4f3e94.ngrok.io";
         String content = "点击下方重置链接重置密码<br><a href = \""+address+"/user/gotoReset?key="
                 + userId + "@" + new java.util.Date().getTime() + "\">重置链接</a><br>有效时长10分钟。";

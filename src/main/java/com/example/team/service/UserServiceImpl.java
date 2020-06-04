@@ -58,11 +58,9 @@ public class UserServiceImpl implements UserService {
     public boolean sign(User user, Pet pet) {
         String email = user.getEmail();
         String tel = user.getTel();
-        String name = user.getName();
         User user_1 = userDAO.getByEmail(email);
         User user_2 = userDAO.getByTel(tel);
-        User user_3 = userDAO.getByName(name);
-        if (user_1 == null && user_2 == null && user_3 == null) {
+        if (user_1 == null && user_2 == null) {
             petDAO.add(pet);
             user.setPet(pet);
             userDAO.add(user);
@@ -78,7 +76,7 @@ public class UserServiceImpl implements UserService {
      * @return: int 
      * @update: time: 2020/6/3 9:31 
      */
-    public int getUserId(String tel, String email, String name) {
+    public int getUserId(String tel, String email) {
         if (tel != null) {
             if (userDAO.getByTel(tel) != null) {
                 return userDAO.getByTel(tel).getUserId();
@@ -87,11 +85,6 @@ public class UserServiceImpl implements UserService {
         if (email != null) {
             if (userDAO.getByEmail(email) != null) {
                 return userDAO.getByEmail(email).getUserId();
-            }
-        }
-        if (name != null) {
-            if (userDAO.getByName(name) != null) {
-                return userDAO.getByName(name).getUserId();
             }
         }
         return 0;
@@ -150,15 +143,12 @@ public class UserServiceImpl implements UserService {
      */
     public boolean updateUserName(int userId, String userName) {
         User user = userDAO.get(User.class, userId);
-        User user1 = userDAO.getByName(userName);
-        if (user1 != null && !userName.equals(user.getName())) {
-            return false;
-        }
         if (!userName.equals("")) {
             user.setName(userName);
+            userDAO.update(user);
+            return true;
         }
-        userDAO.update(user);
-        return true;
+        return false;
     }
 
     @Override

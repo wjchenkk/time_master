@@ -13,7 +13,7 @@ public interface UserService {
 
     public boolean sign(User user, Pet pet);
 
-    public int getUserId(String tel, String email, String name);
+    public int getUserId(String tel, String email);
 
     public int getId();
 
