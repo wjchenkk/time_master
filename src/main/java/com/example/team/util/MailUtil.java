@@ -17,13 +17,11 @@ public class MailUtil {
         mailInfo.setFromAddress("wjchen1015@163.com");
         mailInfo.setToAddress(email);
         mailInfo.setSubject(title);
-        //String content = "点击下方重置链接重置密码<br><a href = \"http://localhost:8080/user/gotoReset?key="
-               // + userId + "@" + now.getTime() + "\">重置链接</a><br>有效时长10分钟。";
         mailInfo.setContent(content);
         //这个类主要来发送邮件
         try {
             SimpleMailSender sms = new SimpleMailSender();
-            sms.sendTextMail(mailInfo);//发送文体格式
+            //sms.sendTextMail(mailInfo);//发送文体格式
             SimpleMailSender.sendHtmlMail(mailInfo);//发送html格式
             flag = true;
         } catch (Exception e) {

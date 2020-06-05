@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
+
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -360,6 +361,7 @@ public class TeamController extends BaseController {
         else {
             records = "option输入错误";
         }
-        return records;
+
+        //return records;
     }
 }
