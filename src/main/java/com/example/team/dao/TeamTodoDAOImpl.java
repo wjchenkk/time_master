@@ -14,15 +14,68 @@ public class TeamTodoDAOImpl extends BaseDAOImpl<TeamTodo> implements TeamTodoDA
 
 
     @Override
-    public void deleteByUser(String name, int userId ,int teamId) {
+    public void saveList(List<TeamTodo> list) {
+        Session session = getSession();
+        int cnt = 0;
+        for (TeamTodo t : list) {
+            TeamTodo temp = new TeamTodo();
+            temp.setTeamTodoSetId(t.getTeamTodoSetId());
+            temp.setCreate(t.getCreate());
+            temp.setName(t.getName());
+            temp.setTeamId(t.getTeamId());
+            temp.setUserId(t.getUserId());
+            temp.setTodoStatusId(1);
+            temp.setTime(t.getTime());
+            session.save(temp);
+            cnt++;
+            if (cnt % 20 == 0) {
+
+                session.flush();
+
+                session.clear();
+            }
+        }
+    }
+
+    @Override
+    public void deleteByUser(String name, int userId, int teamId) {
         Session session = getSession();
         String hql = "from TeamTodo where name = :name and userId = :userId and teamId = :teamId";
         TeamTodo teamTodo = (TeamTodo) session.createQuery(hql)
                 .setParameter("name", name)
                 .setParameter("userId", userId)
-                .setParameter("teamId",teamId)
+                .setParameter("teamId", teamId)
                 .uniqueResult();
         session.delete(teamTodo);
+    }
+
+    @Override
+    public void deleteList(int userId, int teamId) {
+        Session session = getSession();
+        String hqlUpdate = "delete from TeamTodo  where teamId= :teamId and userId=:userId";
+        int updatedEntities = session.createQuery(hqlUpdate)
+                .setParameter("teamId", teamId)
+                .setParameter("userId", userId)
+                .executeUpdate();
+    }
+
+    @Override
+    public void deleteBySet(int teamId, int todoSetId) {
+        Session session = getSession();
+        String hqlUpdate = "delete from TeamTodo  where teamId= :teamId and teamTodoSetId=:todoSetId";
+        int updatedEntities = session.createQuery(hqlUpdate)
+                .setParameter("teamId", teamId)
+                .setParameter("todoSetId", todoSetId)
+                .executeUpdate();
+    }
+
+    @Override
+    public void deleteList(int teamId) {
+        Session session = getSession();
+        String hqlUpdate = "delete from TeamTodo  where teamId= :teamId";
+        int updatedEntities = session.createQuery(hqlUpdate)
+                .setParameter("teamId", teamId)
+                .executeUpdate();
     }
 
     @Override

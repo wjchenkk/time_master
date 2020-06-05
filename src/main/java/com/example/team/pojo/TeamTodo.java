@@ -36,6 +36,7 @@ public class TeamTodo {
     @JsonIgnore
     private int userId;
 
+
     public int getTeamTodoId() {
         return teamTodoId;
     }
@@ -107,4 +108,5 @@ public class TeamTodo {
     public void setUserId(int userId) {
         this.userId = userId;
     }
+
 }

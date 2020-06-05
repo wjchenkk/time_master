@@ -23,7 +23,7 @@ class UserServiceImplTest {
     @Autowired
     private AchievementService achievementService;
 
-    @Test
+    /*@Test
     @Transactional
     @Rollback(true)
     void verify() {

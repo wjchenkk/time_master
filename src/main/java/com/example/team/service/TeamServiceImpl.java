@@ -1,6 +1,8 @@
 package com.example.team.service;
 
 import com.example.team.dao.TeamDAO;
+import com.example.team.dao.TeamTodoDAO;
+import com.example.team.dao.TeamTodoSetDAO;
 import com.example.team.dao.UserDAO;
 import com.example.team.pojo.Team;
 import com.example.team.pojo.User;
@@ -13,6 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class TeamServiceImpl implements TeamService {
     @Autowired
     private TeamDAO teamDAO;
+    @Autowired
+    private TeamTodoDAO teamTodoDAO;
+    @Autowired
+    private TeamTodoSetDAO teamTodoSetDAO;
 
     @Override
     /**
@@ -50,6 +56,13 @@ public class TeamServiceImpl implements TeamService {
      */
     public void deleteTeam(int teamId) {
         teamDAO.delete(teamId);
+        teamTodoSetDAO.deleteList(teamId);
+        teamTodoDAO.deleteList(teamId);
+    }
+
+    @Override
+    public Team get(int teamId) {
+        return teamDAO.get(Team.class,teamId);
     }
 
 }

@@ -37,7 +37,7 @@ public class TeamController extends BaseController {
     private TeamTodoService teamTodoService;
     @Autowired
     private TeamTodoSetService teamTodoSetService;
-    
+
     @RequestMapping(value = "/createTeam", method = RequestMethod.POST)
     @ResponseBody
     /**
@@ -56,7 +56,7 @@ public class TeamController extends BaseController {
         team.setLeader(user);
         return teamService.createTeam(user, team);
     }
-    
+
     @RequestMapping(value = "/deleteTeam", method = RequestMethod.POST)
     @ResponseBody
     /**
@@ -70,21 +70,21 @@ public class TeamController extends BaseController {
         teamService.deleteTeam(teamId);
         return "delete-success";
     }
-    
+
     @RequestMapping(value = "/joinTeam", method = RequestMethod.POST)
     @ResponseBody
-   /**
-    * @description: 加入团队
-    * @Param: [param]
-    * @return: com.example.team.pojo.Team
-    * @update: time: 2020/6/3 9:27
-    */
+    /**
+     * @description: 加入团队
+     * @Param: [param]
+     * @return: com.example.team.pojo.Team
+     * @update: time: 2020/6/3 9:27
+     */
     public Team joinTeam(@RequestBody Map<String, Object> param) {
         int teamId = Integer.parseInt(param.get("teamId").toString());
         int userId = Integer.parseInt(request.getHeader("id"));
         return userService.joinTeam(teamId, userId);
     }
-    
+
     @RequestMapping(value = "/quitTeam", method = RequestMethod.POST)
     @ResponseBody
     /**
@@ -101,7 +101,7 @@ public class TeamController extends BaseController {
         }
         return "quit-fail";
     }
-    
+
     @RequestMapping(value = "/inviteMember", method = RequestMethod.POST)
     @ResponseBody
     /**
@@ -114,16 +114,16 @@ public class TeamController extends BaseController {
         int teamId = Integer.parseInt(param.get("teamId").toString());
         String email = param.get("email").toString();
         int userId = userService.getUserId("", email);
-        Team team=userService.joinTeam(teamId, userId);
+        Team team = userService.joinTeam(teamId, userId);
         if (team != null) {
-            if(team.getTeamId()==-1){
+            if (team.getTeamId() == -1) {
                 return "invited";
             }
             return "invite-success";
         }
         return "invite-fail";
     }
-    
+
     @RequestMapping(value = "/outMember", method = RequestMethod.POST)
     @ResponseBody
     /**
@@ -136,12 +136,15 @@ public class TeamController extends BaseController {
         int teamId = Integer.parseInt(param.get("teamId").toString());
         String email = param.get("email").toString();
         int userId = userService.getUserId("", email);
-        if (userService.quitTeam(teamId, userId)) {
-            return "out-success";
+        if (teamService.get(teamId).getLeader().getUserId() != userId) {
+            if (userService.quitTeam(teamId, userId)) {
+                return "out-success";
+            }
+            return "out-fail";
         }
-        return "out-fail";
+        return "no-out-you";
     }
-    
+
     @RequestMapping(value = "/getMembers", method = RequestMethod.GET)
     @ResponseBody
     /**
@@ -154,7 +157,7 @@ public class TeamController extends BaseController {
         int teamId1 = Integer.parseInt(teamId);
         return userService.getMembers(teamId1);
     }
-    
+
     @RequestMapping(value = "/getTeams", method = RequestMethod.GET)
     @ResponseBody
     /**
@@ -167,7 +170,7 @@ public class TeamController extends BaseController {
         int userId = Integer.parseInt(request.getHeader("id"));
         return userService.getTeams(userId);
     }
-    
+
     @RequestMapping(value = "/updateTeam", method = RequestMethod.POST)
     @ResponseBody
     /**
@@ -186,7 +189,7 @@ public class TeamController extends BaseController {
         return "update-success";
     }
 
-    @RequestMapping(value = "/getRecords", method = RequestMethod.GET,produces = "application/json;charset=utf-8")
+    @RequestMapping(value = "/getRecords", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
     @ResponseBody
     /**
      * @description: 获取团队使用情况记录
@@ -194,7 +197,7 @@ public class TeamController extends BaseController {
      * @return: java.lang.String
      * @update: time: 2020/6/3 9:27
      */
-    public String getRecords( @RequestParam String option, @RequestParam String teamId,HttpServletResponse response){
+    public String getRecords(@RequestParam String option, @RequestParam String teamId, HttpServletResponse response) {
         int todoNum = 0;
         int todoSetNum = 0;
         String records = "";
@@ -203,31 +206,31 @@ public class TeamController extends BaseController {
         Set<User> setUser = userService.getMembers(teamId1);
         List<TeamTodoSet> teamTodoSetList = teamTodoSetService.listByTeamId(teamId1);
         List<DataVo> dataVOList = new ArrayList<>();
-        if (option1 == 1){
-            for (User user : setUser){
+        if (option1 == 1) {
+            for (User user : setUser) {
                 todoNum = 0;
                 todoSetNum = 0;
-                List<TeamTodo> teamTodoList = teamTodoService.listByUser(teamId1,user.getUserId());
+                List<TeamTodo> teamTodoList = teamTodoService.listByUser(teamId1, user.getUserId());
                 DataVo dataV = new DataVo();
                 dataV.setUserName(user.getName());
                 DataVo dataVO = new DataVo();
-                for (TeamTodo list : teamTodoList){
-                    if (list.getTodoStatusId()==2){
+                for (TeamTodo list : teamTodoList) {
+                    if (list.getTodoStatusId() == 2) {
                         todoNum++;
                     }
                 }
                 dataVO.setName("Todo");
                 dataVO.setCompletion(todoNum + "/" + teamTodoList.size());
                 DataVo dataVO2 = new DataVo();
-                for (TeamTodoSet set : teamTodoSetList){
+                for (TeamTodoSet set : teamTodoSetList) {
                     int i = 0;
-                    List<TeamTodo> todoList = teamTodoService.listTeamTodo(set.getTeamTodoSetId(),teamId1,user.getUserId());
-                    for (TeamTodo list : todoList){
-                        if (list.getTodoStatusId()==2){
+                    List<TeamTodo> todoList = teamTodoService.listTeamTodo(set.getTeamTodoSetId(), teamId1, user.getUserId());
+                    for (TeamTodo list : todoList) {
+                        if (list.getTodoStatusId() == 2) {
                             i++;
                         }
                     }
-                    if (i == todoList.size()){
+                    if (i == todoList.size()) {
                         todoSetNum++;
                     }
                 }
@@ -248,20 +251,19 @@ public class TeamController extends BaseController {
                 SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
                 java.util.Date create = new java.util.Date();
                 String fileName = "output-" + df.format(create);
-                try{
-                    if(StringUtils.contains(userAgent, "Mozilla")){
+                try {
+                    if (StringUtils.contains(userAgent, "Mozilla")) {
                         fileName = new String(fileName.getBytes(), "ISO8859-1");
-                    }
-                    else {
+                    } else {
                         fileName = URLEncoder.encode(fileName, "utf8");
                     }
-                }catch (UnsupportedEncodingException e){
+                } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
                 response.setCharacterEncoding("UTF-8");
                 // 设置contentType为excel格式
                 response.setContentType("application/vnd.ms-excel;charset=utf-8");
-                response.setHeader("Content-Disposition", "Attachment;Filename="+ fileName+".xls");
+                response.setHeader("Content-Disposition", "Attachment;Filename=" + fileName + ".xls");
                 workbook.write(fos);
                 fos.flush();
             } catch (Exception e) {
@@ -278,37 +280,34 @@ public class TeamController extends BaseController {
                     e.printStackTrace();
                 }
             }
-        }
-        else if (option1 == 2){
-            for (User user : setUser){
+        } else if (option1 == 2) {
+            for (User user : setUser) {
                 DataVo dataV = new DataVo();
                 dataV.setUserName(user.getName());
                 dataVOList.add(dataV);
-                for (TeamTodoSet set : teamTodoSetList){
+                for (TeamTodoSet set : teamTodoSetList) {
                     DataVo dataVO = new DataVo();
                     int i = 0;
-                    List<TeamTodo> todoList = teamTodoService.listTeamTodo(set.getTeamTodoSetId(),teamId1,user.getUserId());
-                    for (TeamTodo list : todoList){
-                        if (list.getTodoStatusId()==2){
+                    List<TeamTodo> todoList = teamTodoService.listTeamTodo(set.getTeamTodoSetId(), teamId1, user.getUserId());
+                    for (TeamTodo list : todoList) {
+                        if (list.getTodoStatusId() == 2) {
                             i++;
                         }
                     }
-                    if (i == todoList.size()){
+                    if (i == todoList.size()) {
                         dataVO.setSName(set.getName());
                         dataVO.setSetRecord("完成");
-                    }
-                    else {
+                    } else {
                         dataVO.setSName(set.getName());
                         dataVO.setSetRecord("未完成");
                     }
                     dataVOList.add(dataVO);
-                    for (TeamTodo list : todoList){
+                    for (TeamTodo list : todoList) {
                         DataVo dataVO1 = new DataVo();
-                        if (list.getTodoStatusId()==2){
+                        if (list.getTodoStatusId() == 2) {
                             dataVO1.setName(list.getName());
                             dataVO1.setRecord("完成");
-                        }
-                        else {
+                        } else {
                             dataVO1.setName(list.getName());
                             dataVO1.setRecord("未完成");
                         }
@@ -327,20 +326,19 @@ public class TeamController extends BaseController {
                 SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
                 java.util.Date create = new java.util.Date();
                 String fileName = "output-" + df.format(create);
-                try{
-                    if(StringUtils.contains(userAgent, "Mozilla")){
+                try {
+                    if (StringUtils.contains(userAgent, "Mozilla")) {
                         fileName = new String(fileName.getBytes(), "ISO8859-1");
-                    }
-                    else {
+                    } else {
                         fileName = URLEncoder.encode(fileName, "utf8");
                     }
-                }catch (UnsupportedEncodingException e){
+                } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
                 response.setCharacterEncoding("UTF-8");
                 // 设置contentType为excel格式
                 response.setContentType("application/vnd.ms-excel;charset=utf-8");
-                response.setHeader("Content-Disposition", "Attachment;Filename="+ fileName+".xls");
+                response.setHeader("Content-Disposition", "Attachment;Filename=" + fileName + ".xls");
                 workbook.write(fos);
                 fos.flush();
             } catch (Exception e) {
@@ -357,8 +355,7 @@ public class TeamController extends BaseController {
                     e.printStackTrace();
                 }
             }
-        }
-        else {
+        } else {
             records = "option输入错误";
         }
 
