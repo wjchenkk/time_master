@@ -11,14 +11,16 @@ import com.example.team.util.DateUtil;
 import com.example.team.util.ExcelWr;
 
 import com.example.team.util.ExcelWriter;
+import org.apache.commons.lang.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.net.URLEncoder;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -183,7 +185,7 @@ public class TeamController extends BaseController {
         return "update-success";
     }
 
-    @RequestMapping(value = "/getRecords", method = RequestMethod.POST,produces = "application/json;charset=utf-8")
+    @RequestMapping(value = "/getRecords", method = RequestMethod.GET,produces = "application/json;charset=utf-8")
     @ResponseBody
     /**
      * @description: 获取团队使用情况记录
@@ -191,21 +193,20 @@ public class TeamController extends BaseController {
      * @return: java.lang.String
      * @update: time: 2020/6/3 9:27
      */
-    public String getRecords(@RequestBody Map<String, Object> param,@RequestHeader("id") int userId){
+    public String getRecords( @RequestParam String option, @RequestParam String teamId,HttpServletResponse response){
         int todoNum = 0;
         int todoSetNum = 0;
         String records = "";
-        int option = Integer.parseInt(param.get("option").toString());
-        int teamId = Integer.parseInt(param.get("teamId").toString());
-        String path = param.get("path").toString();
-        Set<User> setUser = userService.getMembers(teamId);
-        List<TeamTodoSet> teamTodoSetList = teamTodoSetService.listByTeamId(teamId);
+        int option1 = Integer.parseInt(option);
+        int teamId1 = Integer.parseInt(teamId);
+        Set<User> setUser = userService.getMembers(teamId1);
+        List<TeamTodoSet> teamTodoSetList = teamTodoSetService.listByTeamId(teamId1);
         List<DataVo> dataVOList = new ArrayList<>();
-        if (option == 1){
+        if (option1 == 1){
             for (User user : setUser){
                 todoNum = 0;
                 todoSetNum = 0;
-                List<TeamTodo> teamTodoList = teamTodoService.listByUser(teamId,user.getUserId());
+                List<TeamTodo> teamTodoList = teamTodoService.listByUser(teamId1,user.getUserId());
                 DataVo dataV = new DataVo();
                 dataV.setUserName(user.getName());
                 DataVo dataVO = new DataVo();
@@ -219,7 +220,7 @@ public class TeamController extends BaseController {
                 DataVo dataVO2 = new DataVo();
                 for (TeamTodoSet set : teamTodoSetList){
                     int i = 0;
-                    List<TeamTodo> todoList = teamTodoService.listTeamTodo(set.getTeamTodoSetId(),teamId,user.getUserId());
+                    List<TeamTodo> todoList = teamTodoService.listTeamTodo(set.getTeamTodoSetId(),teamId1,user.getUserId());
                     for (TeamTodo list : todoList){
                         if (list.getTodoStatusId()==2){
                             i++;
@@ -237,27 +238,37 @@ public class TeamController extends BaseController {
             }
             records = "操作1";
             // 写入数据到工作簿对象内
-            Workbook workbook = ExcelWr.exportData(dataVOList);
+            HSSFWorkbook workbook = ExcelWr.exportData(dataVOList);
             // 以文件的形式输出工作簿对象
-            FileOutputStream fileOut = null;
+            OutputStream fos = null;
             try {
-                //文件不用创建，会自动生成的
+                fos = response.getOutputStream();
+                String userAgent = request.getHeader("USER-AGENT");
                 SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
                 java.util.Date create = new java.util.Date();
-                String exportFilePath = path + "\\output-" + df.format(create) + ".xlsx";
-                File exportFile = new File(exportFilePath);
-                if (!exportFile.exists()) {
-                    exportFile.createNewFile();
+                String fileName = "output-" + df.format(create);
+                try{
+                    if(StringUtils.contains(userAgent, "Mozilla")){
+                        fileName = new String(fileName.getBytes(), "ISO8859-1");
+                    }
+                    else {
+                        fileName = URLEncoder.encode(fileName, "utf8");
+                    }
+                }catch (UnsupportedEncodingException e){
+                    e.printStackTrace();
                 }
-                fileOut = new FileOutputStream(exportFilePath);
-                workbook.write(fileOut);
-                fileOut.flush();
+                response.setCharacterEncoding("UTF-8");
+                // 设置contentType为excel格式
+                response.setContentType("application/vnd.ms-excel;charset=utf-8");
+                response.setHeader("Content-Disposition", "Attachment;Filename="+ fileName+".xls");
+                workbook.write(fos);
+                fos.flush();
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
                 try {
-                    if (null != fileOut) {
-                        fileOut.close();
+                    if (null != fos) {
+                        fos.close();
                     }
                     if (null != workbook) {
                         workbook.close();
@@ -267,7 +278,7 @@ public class TeamController extends BaseController {
                 }
             }
         }
-        else if (option == 2){
+        else if (option1 == 2){
             for (User user : setUser){
                 DataVo dataV = new DataVo();
                 dataV.setUserName(user.getName());
@@ -275,7 +286,7 @@ public class TeamController extends BaseController {
                 for (TeamTodoSet set : teamTodoSetList){
                     DataVo dataVO = new DataVo();
                     int i = 0;
-                    List<TeamTodo> todoList = teamTodoService.listTeamTodo(set.getTeamTodoSetId(),teamId,user.getUserId());
+                    List<TeamTodo> todoList = teamTodoService.listTeamTodo(set.getTeamTodoSetId(),teamId1,user.getUserId());
                     for (TeamTodo list : todoList){
                         if (list.getTodoStatusId()==2){
                             i++;
@@ -306,27 +317,37 @@ public class TeamController extends BaseController {
             }
             records = "操作2";
             // 写入数据到工作簿对象内
-            Workbook workbook = ExcelWriter.exportData(dataVOList);
+            HSSFWorkbook workbook = ExcelWriter.exportData(dataVOList);
             // 以文件的形式输出工作簿对象
-            FileOutputStream fileOut = null;
+            OutputStream fos = null;
             try {
-                //文件不用创建，会自动生成的
+                fos = response.getOutputStream();
+                String userAgent = request.getHeader("USER-AGENT");
                 SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
                 java.util.Date create = new java.util.Date();
-                String exportFilePath = path + "\\output-" + df.format(create) + ".xlsx";
-                File exportFile = new File(exportFilePath);
-                if (!exportFile.exists()) {
-                    exportFile.createNewFile();
+                String fileName = "output-" + df.format(create);
+                try{
+                    if(StringUtils.contains(userAgent, "Mozilla")){
+                        fileName = new String(fileName.getBytes(), "ISO8859-1");
+                    }
+                    else {
+                        fileName = URLEncoder.encode(fileName, "utf8");
+                    }
+                }catch (UnsupportedEncodingException e){
+                    e.printStackTrace();
                 }
-                fileOut = new FileOutputStream(exportFilePath);
-                workbook.write(fileOut);
-                fileOut.flush();
+                response.setCharacterEncoding("UTF-8");
+                // 设置contentType为excel格式
+                response.setContentType("application/vnd.ms-excel;charset=utf-8");
+                response.setHeader("Content-Disposition", "Attachment;Filename="+ fileName+".xls");
+                workbook.write(fos);
+                fos.flush();
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
                 try {
-                    if (null != fileOut) {
-                        fileOut.close();
+                    if (null != fos) {
+                        fos.close();
                     }
                     if (null != workbook) {
                         workbook.close();
