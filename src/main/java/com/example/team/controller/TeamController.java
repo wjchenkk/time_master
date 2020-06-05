@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -183,7 +184,8 @@ public class TeamController extends BaseController {
         return "update-success";
     }
 
-    @RequestMapping(value = "/getRecords", method = RequestMethod.POST,produces = "application/json;charset=utf-8")
+    //@RequestMapping(value = "/getRecords", method = RequestMethod.POST,produces = "application/json;charset=utf-8")
+    @RequestMapping("/getRecords")
     @ResponseBody
     /**
      * @description: 获取团队使用情况记录
@@ -191,16 +193,21 @@ public class TeamController extends BaseController {
      * @return: java.lang.String
      * @update: time: 2020/6/3 9:27
      */
-    public String getRecords(@RequestBody Map<String, Object> param,@RequestHeader("id") int userId){
+    //public void getRecords(@RequestBody Map<String, Object> param,@RequestHeader("id") int userId) throws IOException
+    public void getRecords() throws IOException {
         int todoNum = 0;
         int todoSetNum = 0;
         String records = "";
-        int option = Integer.parseInt(param.get("option").toString());
+        /*int option = Integer.parseInt(param.get("option").toString());
         int teamId = Integer.parseInt(param.get("teamId").toString());
-        String path = param.get("path").toString();
+        String path = param.get("path").toString();*/
+        int option=1;
+        int teamId=9;
+        String path="D:";
         Set<User> setUser = userService.getMembers(teamId);
         List<TeamTodoSet> teamTodoSetList = teamTodoSetService.listByTeamId(teamId);
         List<DataVo> dataVOList = new ArrayList<>();
+        Workbook workbook = null;
         if (option == 1){
             for (User user : setUser){
                 todoNum = 0;
@@ -237,7 +244,8 @@ public class TeamController extends BaseController {
             }
             records = "操作1";
             // 写入数据到工作簿对象内
-            Workbook workbook = ExcelWr.exportData(dataVOList);
+            //Workbook workbook = ExcelWr.exportData(dataVOList);
+            workbook = ExcelWr.exportData(dataVOList);
             // 以文件的形式输出工作簿对象
             FileOutputStream fileOut = null;
             try {
@@ -249,9 +257,20 @@ public class TeamController extends BaseController {
                 if (!exportFile.exists()) {
                     exportFile.createNewFile();
                 }
-                fileOut = new FileOutputStream(exportFilePath);
+                /*fileOut = new FileOutputStream(exportFilePath);
                 workbook.write(fileOut);
-                fileOut.flush();
+                fileOut.flush();*/
+                //SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                response.setContentType("application/vnd.ms-excel;charset=utf-8");
+                response.setHeader("Content-disposition", "attachment;filename=" + "output-" + df.format(DateUtil.getCurrentTime()) +
+                        ".xlsx");
+                response.flushBuffer();
+                OutputStream outputStream = response.getOutputStream();
+                workbook.write(response.getOutputStream());
+                workbook.close();
+                outputStream.flush();
+                outputStream.close();
+
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -306,7 +325,8 @@ public class TeamController extends BaseController {
             }
             records = "操作2";
             // 写入数据到工作簿对象内
-            Workbook workbook = ExcelWriter.exportData(dataVOList);
+            //Workbook workbook = ExcelWriter.exportData(dataVOList);
+            workbook = ExcelWriter.exportData(dataVOList);
             // 以文件的形式输出工作簿对象
             FileOutputStream fileOut = null;
             try {
@@ -339,6 +359,7 @@ public class TeamController extends BaseController {
         else {
             records = "option输入错误";
         }
-        return records;
+
+        //return records;
     }
 }
