@@ -26,7 +26,7 @@ public class UserController extends BaseController {
     private AchievementService achievementService;
     @Autowired
     private RedisService redisService;
-    
+
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     @ResponseBody
     /**
@@ -164,7 +164,7 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/updatePassword", method = RequestMethod.POST)
     @ResponseBody
     /**
-     * @description: 
+     * @description: 更新密码
      * @Param: [param]
      * @return: java.lang.String
      * @update: time: 2020/6/3 9:00
@@ -185,7 +185,7 @@ public class UserController extends BaseController {
     @RequestMapping("/getUserInfo")
     @ResponseBody
     /**
-     * @description: 
+     * @description: 获取用户
      * @Param: []
      * @return: com.example.team.pojo.User
      * @update: time: 2020/6/3 9:00
@@ -198,18 +198,18 @@ public class UserController extends BaseController {
     @RequestMapping("/findPassword")
     @ResponseBody
     /**
-     * @description: 
+     * @description: 发送找回链接
      * @Param: [email]
      * @return: java.lang.String
      * @update: time: 2020/6/3 9:00
      */
     public String findPassword(@RequestParam String email) {
         int userId = userService.getUserId("", email);
-        String address="http://3554ff4f3e94.ngrok.io";
-        String content = "点击下方重置链接重置密码<br><a href = \""+address+"/user/gotoReset?key="
+        String address = "http://114.116.232.199:8080";
+        String content = "点击下方重置链接重置密码<br><a href = \"" + address + "/user/gotoReset?key="
                 + userId + "@" + new java.util.Date().getTime() + "\">重置链接</a><br>有效时长10分钟。";
         if (userId != 0) {
-            if (MailUtil.sendEmail(email, "重置密码",content)) {
+            if (MailUtil.sendEmail(email, "重置密码", content)) {
                 return "send-success";
             }
         }
@@ -218,7 +218,7 @@ public class UserController extends BaseController {
 
     @RequestMapping(value = "/gotoReset")
     /**
-     * @description: 
+     * @description: 验证跳转
      * @Param: [key, model]
      * @return: java.lang.String
      * @update: time: 2020/6/3 9:00
@@ -241,7 +241,7 @@ public class UserController extends BaseController {
 
     @RequestMapping(value = "/resetPassword")
     /**
-     * @description: 
+     * @description: 重置密码
      * @Param: [userId, password1, model]
      * @return: java.lang.String
      * @update: time: 2020/6/3 9:00
@@ -261,7 +261,7 @@ public class UserController extends BaseController {
     @RequestMapping("/sendVerification")
     @ResponseBody
     /**
-     * @description: 
+     * @description: 发送验证码
      * @Param: [email]
      * @return: java.lang.String
      * @update: time: 2020/6/3 9:00
@@ -276,8 +276,8 @@ public class UserController extends BaseController {
             code.append(sources.charAt(rand.nextInt(9)));
         }
         content.append(code);
-        if (MailUtil.sendEmail(email, "验证码",content.toString())) {
-            redisService.set(email,code.toString());
+        if (MailUtil.sendEmail(email, "验证码", content.toString())) {
+            redisService.set(email, code.toString());
             redisService.setExpire(email, 300);
             return "send-success";
         }
@@ -286,6 +286,12 @@ public class UserController extends BaseController {
 
     @RequestMapping("/test")
     @ResponseBody
+    /**
+     * @description: 测试登录
+     * @Param: []
+     * @return: java.lang.String
+     * @update: time: 2020/6/4 23:55
+     */
     public String test() {
         return "test-success";
     }
