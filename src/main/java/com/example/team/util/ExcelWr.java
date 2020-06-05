@@ -1,6 +1,7 @@
 package com.example.team.util;
 
 import com.example.team.util.DataVo;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
@@ -26,9 +27,9 @@ public class ExcelWr {
      * @param dataList 数据列表
      * @return 写入数据后的工作簿对象
      */
-    public static Workbook exportData(List<DataVo> dataList) {
+    public static HSSFWorkbook exportData(List<DataVo> dataList) {
         // 生成xlsx的Excel
-        Workbook workbook = new SXSSFWorkbook();
+        HSSFWorkbook workbook = new HSSFWorkbook();
 
         // 如需生成xls的Excel，请使用下面的工作簿对象，注意后续输出时文件后缀名也需更改为xls
         //Workbook workbook = new HSSFWorkbook();
