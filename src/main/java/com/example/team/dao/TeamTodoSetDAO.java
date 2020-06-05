@@ -9,4 +9,6 @@ public interface TeamTodoSetDAO extends BaseDAO<TeamTodoSet>{
     TeamTodoSet getByName(String name,int teamId);
 
     List<TeamTodoSet> list(int teamId);
+
+    void deleteList(int teamId);
 }

@@ -12,4 +12,6 @@ public interface TeamService {
 
     void deleteTeam(int teamId);
 
+    Team get(int teamId);
+
 }

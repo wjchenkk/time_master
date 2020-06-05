@@ -26,7 +26,7 @@ class RecordServiceImplTest {
     @Autowired
     private DailyRecordDAO dailyRecordDAO;
 
-    @Test
+    /*@Test
     void getAccRecord() {
 
         //AccRecord accRecord = recordService.getAccRecord(2);

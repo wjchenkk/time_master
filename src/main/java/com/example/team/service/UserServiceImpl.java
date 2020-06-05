@@ -1,18 +1,16 @@
 package com.example.team.service;
 
-import com.example.team.dao.PetDAO;
-import com.example.team.dao.TeamDAO;
-import com.example.team.dao.UserDAO;
+import com.example.team.dao.*;
 import com.example.team.mail.MailSenderInfo;
 import com.example.team.mail.SimpleMailSender;
-import com.example.team.pojo.Pet;
-import com.example.team.pojo.Team;
-import com.example.team.pojo.User;
+import com.example.team.pojo.*;
+import com.example.team.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -28,6 +26,10 @@ public class UserServiceImpl implements UserService {
     private PetDAO petDAO;
     @Autowired
     private TeamDAO teamDAO;
+    @Autowired
+    private TeamTodoDAO teamTodoDAO;
+    @Autowired
+    private TeamTodoSetDAO teamTodoSetDAO;
 
     /**
      * @description: 验证登录
@@ -229,6 +231,8 @@ public class UserServiceImpl implements UserService {
             }
             team.getUsers().add(user);
             teamDAO.update(team);
+            List<TeamTodo> list=teamTodoDAO.listByUser(teamId,team.getLeader().getUserId());
+            teamTodoDAO.saveList(list);
             return team;
         }
         return null;
@@ -253,8 +257,10 @@ public class UserServiceImpl implements UserService {
                 }
             }
             teamDAO.update(team);
+            teamTodoDAO.deleteList(userId,teamId);
             if (team.getUsers().size() == 0) {
                 teamDAO.delete(teamId);
+                teamTodoSetDAO.deleteList(teamId);
             }
         }
         return flag;
